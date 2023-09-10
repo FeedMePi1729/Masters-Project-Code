@@ -15,6 +15,21 @@ class Simulation:
         self.steps = steps
         self.endTime = endTime
         self.stepSize = endTime/steps
+        
+    def getPath(self):
+        """ Returns a realised path of a process
+
+        Returns:
+            numpy array: gives the path of a process
+        """
+        
+        process = np.zeros(self.steps)
+        process[0] = float(self.initialPosition)
+        for i in range(self.steps-1):
+            process[i+1] = process[i] + self.drift(i*self.stepSize, process[i])*self.stepSize + self.diffusion(i*self.stepSize, process[i])*self.brownianMotionIncrement()
+        self.simulatedPath = process
+        
+        return self.simulatedPath
     
     def brownianMotionIncrement(self):
         """Generates a brownian motion increment
@@ -42,11 +57,7 @@ class Simulation:
             array: returns an array of size steps containing the simulated path of the process
         """
 
-        process = np.zeros(self.steps)
-        process[0] = float(self.initialPosition)
-        for i in range(self.steps-1):
-            process[i+1] = process[i] + self.drift(i*self.stepSize, process[i])*self.stepSize + self.diffusion(i*self.stepSize, process[i])*self.brownianMotionIncrement()
-        self.simulatedPath = process
+        
     
     def plotPath(self):
         """
@@ -54,6 +65,7 @@ class Simulation:
         """
         self.simulationDiffusion()
         time = np.linspace(0, self.endTime, self.steps)
+        self.getPath()
         plt.plot(time, self.simulatedPath)
         plt.show()
     
