@@ -1,26 +1,61 @@
 #include <iostream>
 
+double TIME_STEP_SIZE = 0.05;
+double SPACE_STEP_SIZE = 0.005;
+double END_TIME = 1;
+double STOCK_UPPER_BOUND = 4;
+double INTEREST = 0.01;
+double VOLATILITY = 1;
+int ROWS;
+int COLUMNS;
 
-void incrementSetter(double& timeIncrement, double& spaceIncrement){
-    // Used for setting the time and space increments
-    double newTimeIncrement, newSpaceIncrement;
-    std::cout << "Enter New Time Increment: "; std::cin >> newTimeIncrement;
-    std::cout << "Enter New Space Increment: "; std::cin >> newSpaceIncrement;
-    timeIncrement = newTimeIncrement;
-    spaceIncrement = newSpaceIncrement;
-}
 
  // TODO: find a way to make the initial condition of the grid be what we want it to be
- 
+int timeSteps(double endTime, double timeIncrement){
+    return static_cast<int>(endTime/timeIncrement);
+}
+
+int stockSteps(double stockUpperBound, double spaceIncrement){
+    return static_cast<int>(stockUpperBound/spaceIncrement);
+}
+
+void gridDimensions(
+    double endTime,
+    double stockUpperBound,
+    double timeIncrement,
+    double spaceIncrement,
+    int& rows,
+    int& columns){
+        int nRows = endTime/timeIncrement;
+        int nCols = stockUpperBound/spaceIncrement + 2*nRows; // to deal with the unbounded case
+        rows = nRows;
+        columns = nCols;
+}
+
+double payoff(double stock, double strike=0){
+    if (stock - strike > 0){
+        return stock - strike;
+    }
+    return 0;
+}
+
 int main(){
-    double timeIncrement = 0;
-    double spaceIncrement = 0;
-    double endTime = 1;
-    double stockUpperBound = 4;
-    incrementSetter(timeIncrement, spaceIncrement);
-    int timeSteps = endTime/timeIncrement;
-    int stockSteps = stockUpperBound/spaceIncrement;
-    double SOLUTION_GRID[timeSteps][stockSteps]; // Sets the grid for our PDE to solve
-    std::cout << sizeof(SOLUTION_GRID);
+    gridDimensions(END_TIME, STOCK_UPPER_BOUND, TIME_STEP_SIZE, SPACE_STEP_SIZE, ROWS, COLUMNS);
+    double SOLUTION_GRID[ROWS][COLUMNS]; // Sets the grid for our PDE to solve
+
+    for (int i=0; i<COLUMNS; i++){ // initialising grid
+        SOLUTION_GRID[0][i] = payoff(-ROWS*SPACE_STEP_SIZE + i*SPACE_STEP_SIZE);
+    };
+
+    for (int timeStep=0; timeStep<ROWS-1; timeStep++){
+        for (int spaceStep=0; spaceStep<COLUMNS; spaceStep++){
+            double currentValue = SOLUTION_GRID[timeStep][spaceStep];
+            double firstDerivative = (SOLUTION_GRID[timeStep][spaceStep+1] - SOLUTION_GRID[timeStep][spaceStep-1])/(2*TIME_STEP_SIZE);
+            double secondDerivative = (SOLUTION_GRID[timeStep][spaceStep+1] - 2*SOLUTION_GRID[timeStep][spaceStep]- SOLUTION_GRID[timeStep][spaceStep-1])/(TIME_STEP_SIZE*TIME_STEP_SIZE);
+            double stock = -ROWS*SPACE_STEP_SIZE + spaceStep*SPACE_STEP_SIZE;
+            SOLUTION_GRID[timeStep+1][spaceStep] = currentValue - SPACE_STEP_SIZE*(INTEREST*currentValue - INTEREST*stock*firstDerivative - 0.5*VOLATILITY*VOLATILITY*stock*secondDerivative); 
+        };
+    }; // This is the scheme to solving the PDE
+
     return 0;
 }
