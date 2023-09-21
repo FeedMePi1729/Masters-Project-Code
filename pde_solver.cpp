@@ -32,9 +32,7 @@ float initialValue(float spaceVal){
     return 0;
 }
 
-
-
-int main(){
+double optionFairPrice(double stockPrice, double time){
     getGridDimensions();
     double SOLUTION_GRID[ROWS][COLUMNS];
     for (int i=1; i<COLUMNS; i++){ // initial condition
@@ -54,8 +52,16 @@ int main(){
             double generator = INTEREST*currentValue - INTEREST*stockPrice*firstDerivative - 0.5*VOLATILITY_SQUARED*std::pow(stockPrice, 2)*secondDerivative;
             SOLUTION_GRID[timeStep+1][spaceStep] = currentValue - STEP_SIZE_SPACE*generator; // ready to solve a generic problem
         }
-    } // This provides the solution for Black-Scholes Model
+    }
+    int spaceIndex = stockPrice/STEP_SIZE_SPACE;
+    int timeIndex = (TIME_UPPER_BOUND-time)/STEP_SIZE_TIME;
 
-    
+    return SOLUTION_GRID[timeIndex][spaceIndex]; 
+}
+
+int main(){
+    for (int t=0; t<TIME_UPPER_BOUND; t++){
+        std::cout << optionFairPrice(5, t) << '\n';
+    }
     return 0;
 }
