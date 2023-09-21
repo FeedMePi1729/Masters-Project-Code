@@ -3,11 +3,11 @@
 
 double STEP_SIZE_SPACE = 0.05;
 double STEP_SIZE_TIME = std::sqrt(2*STEP_SIZE_SPACE); // ensures stability of solution
-double SPACE_UPPER_BOUND = 10;
+double SPACE_UPPER_BOUND = 100;
 double SPACE_LOWER_BOUND = 0;
 double TIME_UPPER_BOUND = 10;
-double INTEREST = 0.01;
-double VOLATILITY_SQUARED = 1;
+double INTEREST = 1;
+double VOLATILITY_SQUARED = 0.04; // require volatility to be small in order to ensure the stability of solution
 int COLUMNS;
 int ROWS;
 
@@ -42,7 +42,7 @@ int main(){
     }
     for (int i=0; i<ROWS; i++){
         SOLUTION_GRID[i][0] = 0;
-        SOLUTION_GRID[i][COLUMNS-1] = 100;
+        SOLUTION_GRID[i][COLUMNS-1] = 95;
     }
 
     for (int timeStep=0; timeStep<ROWS-1; timeStep++){
@@ -54,9 +54,8 @@ int main(){
             double generator = INTEREST*currentValue - INTEREST*stockPrice*firstDerivative - 0.5*VOLATILITY_SQUARED*std::pow(stockPrice, 2)*secondDerivative;
             SOLUTION_GRID[timeStep+1][spaceStep] = currentValue - STEP_SIZE_SPACE*generator; // ready to solve a generic problem
         }
-    }
-    for (int i=0; i<ROWS; i++){
-        std::cout << SOLUTION_GRID[i][100] << '\n';
-    }
+    } // This provides the solution for Black-Scholes Model
+
+    
     return 0;
 }
