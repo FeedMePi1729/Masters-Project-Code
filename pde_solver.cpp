@@ -1,12 +1,13 @@
 #include <iostream>
 #include <cmath>
 #include <fstream>
+#include <format>
 
 double STEP_SIZE_SPACE = 0.05;
-double STEP_SIZE_TIME = std::sqrt(2*STEP_SIZE_SPACE); // ensures stability of solution
+double STEP_SIZE_TIME = std::sqrt(8*STEP_SIZE_SPACE); // ensures stability of solution
 double SPACE_UPPER_BOUND = 50;
 double SPACE_LOWER_BOUND = 0;
-double TIME_UPPER_BOUND = 1;
+double TIME_UPPER_BOUND = 10;
 double INTEREST = 0.05;
 double VOLATILITY_SQUARED = 0.04; // require volatility to be small in order to ensure the stability of solution
 int COLUMNS;
@@ -61,8 +62,14 @@ double optionFairPrice(double stockPrice, double time){
 }
 
 int main(){
-    for (int t=0; t<TIME_UPPER_BOUND; t++){
-        std::cout << optionFairPrice(10, t) << '\n';
+    std::ofstream solutionSpace;
+    solutionSpace.open("solutionSpace.txt");
+    for (int time=0; time<ROWS; time++){
+        for (int stock=0; stock<COLUMNS; stock++){
+            solutionSpace << std::format("{}", optionFairPrice(stock*STEP_SIZE_SPACE, time*STEP_SIZE_TIME)) << " ";
+        }
+        solutionSpace << '\n';
     }
+    solutionSpace.close();
     return 0;
 }
