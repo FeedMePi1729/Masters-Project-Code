@@ -12,6 +12,7 @@ class Simulation:
         self.drift = diffusionProcess.drift
         self.diffusion = diffusionProcess.diffusion
         self.initialPosition = diffusionProcess.initialPosition
+        self.process = diffusionProcess
         self.steps = steps
         self.endTime = endTime
         self.stepSize = endTime/steps
@@ -26,12 +27,20 @@ class Simulation:
         process = np.zeros(self.steps)
         process[0] = float(self.initialPosition)
         for i in range(self.steps-1):
-            process[i+1] = process[i] + self.drift(i*self.stepSize, process[i])*self.stepSize + self.diffusion(i*self.stepSize, process[i])*self.brownianMotionIncrement()
+            process[i+1] = process[i] + self.drift(i*self.stepSize, process[i])*self.stepSize + self.diffusion(i*self.stepSize, process[i])*self._brownianMotionIncrement()
         self.simulatedPath = process
         
         return self.simulatedPath
     
-    def brownianMotionIncrement(self):
+    def getProcess(self):
+        """Returns a Diffusion Object
+
+        Returns:
+            Diffusion Object
+        """
+        return self.process
+    
+    def _brownianMotionIncrement(self):
         """Generates a brownian motion increment
 
         Args:
@@ -83,8 +92,8 @@ class Simulation:
         
 
 def main():
-    drift = lambda t,x: 10*(1-x)
-    diffusion = lambda t,x: np.sqrt(x)
+    drift = lambda t,x: 0.2*x
+    diffusion = lambda t,x: 0.1*x
     initialPosition = 1
     diffusionProcess = Process(drift=drift, diffusion=diffusion, initialPosition=initialPosition)
     simulation = Simulation(diffusionProcess=diffusionProcess, endTime=10, steps=10000)
