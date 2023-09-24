@@ -13,6 +13,42 @@ ROWS = int(TIME_UPPER_BOUND/STEP_SIZE_TIME)
 SOLUTION_GRID = np.zeros((ROWS, COLUMNS))
 
 
+class Grid:
+    def __init__(self, initialCondition):
+        self.initialCondition = initialCondition
+        self.nRows = int(TIME_UPPER_BOUND/STEP_SIZE_TIME)
+        self.nCols = int((SPACE_UPPER_BOUND-SPACE_LOWER_BOUND)/STEP_SIZE_SPACE)
+        self.grid = np.zeros((self.nRows, self.nCols))
+    
+    def initialiseGrid(self, lowerBoundaryCondition=SPACE_LOWER_BOUND, upperBoundaryCondition=SPACE_UPPER_BOUND):
+        for i in range(self.nRows):
+            self.grid[i][0] = lowerBoundaryCondition
+            self.grid[i][self.nCols-1] = upperBoundaryCondition
+        
+        for i in range(self.nCols):
+            self.grid[0][i] = self.initialCondition(i*STEP_SIZE_SPACE)
+    
+    def solvePDE(self):
+        for timeStep in range(self.nRows-1):
+            for spaceStep in range(1, self.nCols-1):
+                stockPrice = STEP_SIZE_SPACE*spaceStep
+                currentValue = self.grid[timeStep][spaceStep]
+                firstDerivative = (self.grid[timeStep][spaceStep+1] - self.grid[timeStep][spaceStep-1])/(2*STEP_SIZE_TIME)
+                secondDerivative = (self.grid[timeStep][spaceStep+1] - 2*self.grid[timeStep][spaceStep] + self.grid[timeStep][spaceStep-1])/(STEP_SIZE_TIME**2)
+                generator = INTEREST*currentValue - INTEREST*stockPrice*firstDerivative - 0.5*VOLATILITY_SQUARED*(stockPrice**2)*secondDerivative
+                self.grid[timeStep+1][spaceStep] = currentValue - STEP_SIZE_SPACE*generator
+    
+    def optionFairPrice(self, stockPrice, time):
+        spaceIndex = int(stockPrice/STEP_SIZE_SPACE)
+        timeIndex = int((TIME_UPPER_BOUND-time)/STEP_SIZE_TIME)
+        return self.grid[timeIndex-1][spaceIndex-1]
+    
+    def plotSolution(self, stockPrice):
+        time = np.arange(0, TIME_UPPER_BOUND, STEP_SIZE_TIME)
+        prices = [optionFairPrice(stockPrice, t) for t in time]
+        plt.plot(time, prices)
+        plt.show()
+        
 def terminalCondition(spaceValue):
     if (spaceValue - 5 > 0):
         return spaceValue - 5
@@ -44,16 +80,12 @@ def optionFairPrice(stockPrice, time):
     return SOLUTION_GRID[timeIndex-1][spaceIndex-1]
 
 def main():
-    initialiseGrid()
-    solvePDE()
-    time = np.linspace(0, TIME_UPPER_BOUND, int((SPACE_UPPER_BOUND-10)/STEP_SIZE_SPACE))
-    stockPrices = np.arange(0, SPACE_UPPER_BOUND-10, STEP_SIZE_SPACE)
-    stockValue = 6
-    for i in range(9):
-        prices = [optionFairPrice(stock, i) for stock in stockPrices]
-        plt.plot(time, prices, label=f'{i}')
-    plt.axvline(x=9)
-    plt.legend()
+    x = Grid(initialCondition=terminalCondition)
+    x.initialiseGrid()
+    x.solvePDE()
+    stockPrice = np.arange(SPACE_LOWER_BOUND, SPACE_UPPER_BOUND, STEP_SIZE_SPACE)
+    price = [optionFairPrice(stock, 1) for stock in stockPrice]
+    plt.plot(stockPrice, price)
     plt.show()
 if __name__ == "__main__":
     main()
