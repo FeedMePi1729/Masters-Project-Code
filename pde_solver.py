@@ -23,13 +23,13 @@ class Grid:
         self.nCols = int((SPACE_UPPER_BOUND-SPACE_LOWER_BOUND)/STEP_SIZE_SPACE)
         self.grid = np.zeros((self.nRows, self.nCols))
     
-    def initialiseGrid(self, lowerBoundaryCondition=SPACE_LOWER_BOUND, upperBoundaryCondition=SPACE_UPPER_BOUND):
+    def initialiseGrid(self, strike, lowerBoundaryCondition=SPACE_LOWER_BOUND, upperBoundaryCondition=SPACE_UPPER_BOUND):
         for i in range(self.nRows):
             self.grid[i][0] = lowerBoundaryCondition
             self.grid[i][self.nCols-1] = upperBoundaryCondition
         
         for i in range(self.nCols):
-            self.grid[0][i] = self.initialCondition(i*STEP_SIZE_SPACE)
+            self.grid[0][i] = self.initialCondition(i*STEP_SIZE_SPACE, strike)
     
     def solvePDE(self):
         for timeStep in range(self.nRows-1):
@@ -52,9 +52,9 @@ class Grid:
         plt.plot(time, prices)
         plt.show()
         
-def terminalCondition(spaceValue):
-    if (spaceValue - 5 > 0):
-        return spaceValue - 5
+def terminalCondition(spaceValue, strike):
+    if (spaceValue - strike> 0):
+        return spaceValue - strike
     return 0
 
 def main():
