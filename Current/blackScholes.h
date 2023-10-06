@@ -13,12 +13,7 @@ class BlackScholes {
             double initialPrice_,
             double interest_,
             double volatility_
-            ){
-            initialPrice = initialPrice_;
-            interest = interest_;
-            volatility = volatility_;
-            srand(time(NULL)); // sets the seed for random numbers
-        }
+            );
         void generateSamplePath(
             double T,
             int m,

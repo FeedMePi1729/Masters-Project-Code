@@ -10,6 +10,17 @@ double gaussian(){
     return sqrt(-2.0*log(U1))*cos(2.0*pi*U2);
 }
 
+BlackScholes::BlackScholes(
+        double initialPrice_,
+        double interest_,
+        double volatility_
+        ){
+        initialPrice = initialPrice_;
+        interest = interest_;
+        volatility = volatility_;
+        srand(time(NULL)); // sets the seed for random numbers
+    }
+
 void BlackScholes::generateSamplePath(double T, int m, SamplePath& S){
     double stockPrice = initialPrice;
     for (int k=0; k<m; k++){
@@ -17,3 +28,4 @@ void BlackScholes::generateSamplePath(double T, int m, SamplePath& S){
         stockPrice = S[k];
     }
 }
+

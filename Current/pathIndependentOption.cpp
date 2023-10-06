@@ -11,10 +11,20 @@ double PathIndependentOption::monteCarloPricer(BlackScholes Model, long iteratio
         return exp(-Model.interest*expiry)*value;
     }
 
+CallOption::CallOption(double expiry_, double strike_, int steps_){
+        expiry = expiry_;
+        strike = strike_;
+        steps = steps_;
+}
+
 double CallOption::payoff(SamplePath& S){
     if (S[steps-1] - strike > 0){
         return S[steps-1] - strike;
     }
+    return 0;
+}
+
+int main(){
     return 0;
 }
 
