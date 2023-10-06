@@ -1,4 +1,4 @@
-#include <pathIndependentOption.h>
+#include "pathIndependentOption.h"
 #include <cmath>
 
 double PathIndependentOption::monteCarloPricer(BlackScholes Model, long iterations){

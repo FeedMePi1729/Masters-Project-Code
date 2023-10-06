@@ -1,5 +1,6 @@
 #include <iostream>
 #include "pathIndependentOption.h"
+
 using namespace std;
 
 int main(){
@@ -11,7 +12,7 @@ int main(){
     CallOption Option(expiry, strike, steps);
 
     long N = 30000;
-    // std::cout << Option.monteCarloPricer(Model, N) << "\n";
-    // Option.monteCarloPricer(Model, N);
+    std::cout << Option.monteCarloPricer(Model, N) << "\n";
+    Option.monteCarloPricer(Model, N);
     return 0;
 }
