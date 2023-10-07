@@ -1,15 +1,5 @@
-#include "pathIndependentOption.h"
+#include "PathIndependentOption.h"
 #include <cmath>
-
-double PathIndependentOption::monteCarloPricer(BlackScholes Model, long iterations){
-        double value;
-        SamplePath S(iterations);
-        for (long n=0; n<iterations; n++){
-            Model.generateSamplePath(expiry, steps, S);
-            value = (n*value + payoff(S))/(n+1);
-        }
-        return exp(-Model.interest*expiry)*value;
-    }
 
 CallOption::CallOption(double expiry_, double strike_, int steps_){
         expiry = expiry_;
@@ -24,8 +14,22 @@ double CallOption::payoff(SamplePath& S){
     return 0;
 }
 
-int main(){
-    return 0;
-}
+double PathIndependentOption::monteCarloPricer(BlackScholes Model, long iterations){
+        double value;
+        SamplePath S(iterations);
+        for (long n=0; n<iterations; n++){
+            Model.generateSamplePath(expiry, steps, S);
+            value = (n*value + payoff(S))/(n+1);
+        }
+        return exp(-Model.interest*expiry)*value;
+    }
+
+
+
+
+
+// int main(){
+//     return 0;
+// }
 
 

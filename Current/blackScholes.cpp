@@ -1,5 +1,6 @@
-#include "blackScholes.h"
 #include <cmath>
+#include "BlackScholes.h"
+
 
 const double pi = 4.0*atan(1.0);
 
@@ -18,7 +19,8 @@ BlackScholes::BlackScholes(
         initialPrice = initialPrice_;
         interest = interest_;
         volatility = volatility_;
-        srand(time(NULL)); // sets the seed for random numbers
+        srand(time(NULL));
+        // sets the seed for random numbers
     }
 
 void BlackScholes::generateSamplePath(double T, int m, SamplePath& S){
@@ -29,3 +31,6 @@ void BlackScholes::generateSamplePath(double T, int m, SamplePath& S){
     }
 }
 
+// int main(){
+//     return 0;
+// }

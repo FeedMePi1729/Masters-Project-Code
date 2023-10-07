@@ -1,5 +1,5 @@
-#ifndef BSModel_h
-#define BSModel_h
+#ifndef BlackScholes_h
+#define BlackScholes_h
 
 using namespace std;
 #include <vector>
