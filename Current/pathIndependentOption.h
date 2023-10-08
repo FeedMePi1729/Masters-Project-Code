@@ -1,7 +1,7 @@
-#ifndef PathIndependentOption_h
-#define PathIndependentOption_h
+#ifndef pathIndependentOption_h
+#define pathIndependentOption_h
 
-#include "BlackScholes.h"
+#include "blackScholes.h"
 
 class PathIndependentOption {
     public:

@@ -1,4 +1,4 @@
-#include "PathIndependentOption.h"
+#include "pathIndependentOption.h"
 #include <cmath>
 
 CallOption::CallOption(double expiry_, double strike_, int steps_){
@@ -24,12 +24,8 @@ double PathIndependentOption::monteCarloPricer(BlackScholes Model, long iteratio
         return exp(-Model.interest*expiry)*value;
     }
 
-
-
-
-
-// int main(){
-//     return 0;
-// }
+int main(){
+    return 0;
+}
 
 

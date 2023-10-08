@@ -1,5 +1,5 @@
 #include <cmath>
-#include "BlackScholes.h"
+#include "blackScholes.h"
 
 
 const double pi = 4.0*atan(1.0);
