@@ -5,9 +5,9 @@ from BlackScholes import BlackScholes
 from PathIndependentOption import *
 
 def main():
-    model = BlackScholes(0.03, 1)
-    derivative = CallOption(2, 1000, 20)
-    print(derivative.monteCarloPricer(model, 10, 10_000))
+    model = Stock(0.03, 1, 10)
+    derivative = CallOption(2, 100, 20)
+    print(derivative.valueProcess(model))
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,5 @@
 import numpy as np
-from BlackScholes import BlackScholes 
+from BlackScholes import BlackScholes, Stock
 
 class Derivative:
     def __init__(self, expiry_, steps_):
@@ -8,44 +8,24 @@ class Derivative:
     
     def payoff(self, samplePath):
         return 0
-    
-    def generateVirtualSamplePath(self, Model: BlackScholes, initialPrice):
-        stockPrice = initialPrice
-        samplePath = np.zeros(self.steps)
-        timeIncrement = self.expiry/self.steps
-        samplePath[0] = stockPrice
-        for i in range(1, self.steps):
-            noise = np.random.normal(0, 1)
-            samplePath[i] = stockPrice*np.exp((Model.interest - 0.5*Model.volatility**2)*timeIncrement + Model.volatility*np.sqrt(timeIncrement)*noise)
-            stockPrice = samplePath[i]
-        self.virtualSamplePath = samplePath
-    
-    def getVirtualSamplePath(self):
-        return self.virtualSamplePath
-    
-    def generateStockProcess(self, Model: BlackScholes, initialPrice):
-        stockPrice = initialPrice
-        samplePath = np.zeros(self.steps)
-        timeIncrement = self.expiry/self.steps
-        samplePath[0] = stockPrice
-        for i in range(1, self.steps):
-            noise = np.random.normal(0, 1)
-            samplePath[i] = stockPrice*np.exp((Model.interest - 0.5*Model.volatility**2)*timeIncrement + Model.volatility*np.sqrt(timeIncrement)*noise)
-            stockPrice = samplePath[i]
-        self.stockProcess = samplePath            
-    
-    def monteCarloPricer(self, Model: BlackScholes, initialPrice, iterations=int(1e+6)):
+           
+    def monteCarloPricer(self, stock: Stock, steps=None, expiry=None, iterations=int(1e+6)):
         value = 0
+        steps = self.steps if steps is None else steps
+        expiry = self.expiry if expiry is None else expiry
         for i in range(iterations):
-            self.generateVirtualSamplePath(Model, initialPrice)
-            path = self.getVirtualSamplePath()
+            stock.generateSamplePath(self.expiry, self.steps)
+            path = stock.getSamplePath()
             value = (i*value + self.payoff(path))/(i+1)
-        return np.exp(-Model.interest*self.expiry)*value
-
-    def valueProcess(self, Model: BlackScholes, initialPrice):
-        self.generateStockProcess()
-        return
-                   
+        return np.exp(-stock.interest*self.expiry)*value
+    
+    def valueProcess(self, stock: Stock):
+        valuePath = np.zeros(self.steps)
+        # valuePath[0] = self.monteCarloPricer(stock)
+        stepSize = self.expiry/self.steps
+        for i in range(self.steps):
+            valuePath[i] = self.monteCarloPricer(stock, steps=self.steps-i, expiry=self.expiry-i*stepSize)
+        return valuePath
 class CallOption(Derivative):
     def __init__(self, expiry_, steps_, strike_):
         self.expiry = expiry_
