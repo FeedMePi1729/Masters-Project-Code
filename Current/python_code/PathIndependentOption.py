@@ -7,27 +7,44 @@ class Derivative:
         self.steps = steps_ 
     
     def payoff(self, samplePath):
-        """
-        This is a function that will be overriden when we use this base class for inheritance
-        """
         return 0
     
-    def monteCarloPricer(self, Model: BlackScholes, iterations=int(1e+6)):
+    def generateVirtualSamplePath(self, Model: BlackScholes, initialPrice):
+        stockPrice = initialPrice
+        samplePath = np.zeros(self.steps)
+        timeIncrement = self.expiry/self.steps
+        samplePath[0] = stockPrice
+        for i in range(1, self.steps):
+            noise = np.random.normal(0, 1)
+            samplePath[i] = stockPrice*np.exp((Model.interest - 0.5*Model.volatility**2)*timeIncrement + Model.volatility*np.sqrt(timeIncrement)*noise)
+            stockPrice = samplePath[i]
+        self.virtualSamplePath = samplePath
+    
+    def getVirtualSamplePath(self):
+        return self.virtualSamplePath
+    
+    def generateStockProcess(self, Model: BlackScholes, initialPrice):
+        stockPrice = initialPrice
+        samplePath = np.zeros(self.steps)
+        timeIncrement = self.expiry/self.steps
+        samplePath[0] = stockPrice
+        for i in range(1, self.steps):
+            noise = np.random.normal(0, 1)
+            samplePath[i] = stockPrice*np.exp((Model.interest - 0.5*Model.volatility**2)*timeIncrement + Model.volatility*np.sqrt(timeIncrement)*noise)
+            stockPrice = samplePath[i]
+        self.stockProcess = samplePath            
+    
+    def monteCarloPricer(self, Model: BlackScholes, initialPrice, iterations=int(1e+6)):
         value = 0
         for i in range(iterations):
-            Model.generateSamplePath(self.expiry, self.steps)
-            path = Model.getSamplePath()
+            self.generateVirtualSamplePath(Model, initialPrice)
+            path = self.getVirtualSamplePath()
             value = (i*value + self.payoff(path))/(i+1)
         return np.exp(-Model.interest*self.expiry)*value
-    
-    def arbitrageFreePrice(self, Model: BlackScholes, simulations, iterations):
-        aggregateSum = 0
-        value = 0
-        for i in range(simulations):
-            value = self.monteCarloPricer(Model, iterations)
-            aggregateSum += value
-        value /= simulations
-        return value
+
+    def valueProcess(self, Model: BlackScholes, initialPrice):
+        self.generateStockProcess()
+        return
                    
 class CallOption(Derivative):
     def __init__(self, expiry_, steps_, strike_):
